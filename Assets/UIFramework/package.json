@@ -23,6 +23,6 @@
     "samples":{
         "displayName": "Samples",
         "description": "Sample of ui framwork",
-        "path": "Samples"
+        "path": "./Samples"
     }
 }
