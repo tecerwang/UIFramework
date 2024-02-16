@@ -7,6 +7,13 @@
       "dependencies": {},
       "hash": "809d23edae0df58fd0f61b4b6f67855c59d1b2fb"
     },
+    "com.sandolkakosdigital.unitypackagemanagerutilities": {
+      "version": "https://github.com/sandolkakos/unity-package-manager-utilities.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "ed39e0470ffd50b3eeca4c8d01ea486e5427408e"
+    },
     "com.unity.addressables": {
       "version": "1.21.19",
       "depth": 0,
