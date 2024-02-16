@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UIFramework;
 using System.Linq;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 
 public class Smaple : MonoBehaviour
 {
@@ -31,7 +31,7 @@ public class Smaple : MonoBehaviour
         }
     }
 
-    private async UniTask CreateUIScreenAndPopup()
+    private async Task CreateUIScreenAndPopup()
     {
         var screen = await UIScreenManager.singleton.CreateScreen("UISampleScreen.prefab");
         if (screen != null)

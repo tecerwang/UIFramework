@@ -2,11 +2,10 @@
     "name": "com.uiframework.unity",
     "version": "0.0.1",
     "displayName": "UI framework for Unity",
-    "description": "Unity3d ui managment depend on UGUI with async coding in UniTask",
+    "description": "Unity3d ui managment depend on UGUI with async coding",
     "unity": "2019.1",
     "unityRelease": "0b5",
     "dependencies": {
-        "com.cysharp.unitask": "2.5.3"
     },
     "keywords": [
         "unity",

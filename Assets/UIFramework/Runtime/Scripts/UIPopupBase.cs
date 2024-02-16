@@ -1,6 +1,6 @@
-using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace UIFramework
@@ -20,21 +20,21 @@ namespace UIFramework
         /// <summary>
         /// component is already instantiated,but not actived
         /// </summary>
-        public abstract UniTask OnPopupGoingShow();
+        public abstract Task OnPopupGoingShow();
 
         /// <summary>
         /// component is already instantiated and actived, shown in game
         /// </summary>
-        public abstract UniTask OnPopupShown();
+        public abstract Task OnPopupShown();
 
         /// <summary>
         /// component is actived, and going to inactive self
         /// </summary>
-        public abstract UniTask OnPopupGoingLeave();
+        public abstract Task OnPopupGoingLeave();
 
         /// <summary>
         /// component is already inactived and going to destory
         /// </summary>
-        public abstract UniTask OnPopupHidden();
+        public abstract Task OnPopupHidden();
     }
 }

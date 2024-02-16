@@ -1,7 +1,7 @@
-using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -45,7 +45,7 @@ namespace UIFramework
         /// <param name="path"> addressable path ,</param>
         /// <param name="paramaters">参数</param>
         /// <returns>返回屏幕脚本实例</returns>
-        public async UniTask<UIScreenBase> CreateScreen(string addressablePath, params object[] paramaters)
+        public async Task<UIScreenBase> CreateScreen(string addressablePath, params object[] paramaters)
         {
             if (!string.IsNullOrEmpty(addressablePath))
             {
@@ -53,7 +53,7 @@ namespace UIFramework
                 {
                     // addressable load
                     AsyncOperationHandle<GameObject> handle = Addressables.LoadAssetAsync<GameObject>($"Screens/{addressablePath}");
-                    var prefab = await handle.ToUniTask<GameObject>();
+                    var prefab = await handle.Task;
                     if (prefab == null)
                     {
                         Utility.LogDebug("UIScreenManager", $"screenPrefab {prefab.name} is missing, please check project assets or Addressable Groups");
@@ -107,25 +107,25 @@ namespace UIFramework
             return null;
         }
 
-        private async UniTask HandleScreenAppear(ScreenContext context)
+        private async Task HandleScreenAppear(ScreenContext context)
         {
             if (context == null)
             {
-                await UniTask.CompletedTask;
+                await Task.CompletedTask;
             }
             Utility.LogDebug("UIScreenManager", $"screenPrefab {context.screen.name} HandleScreenAppear");
             await context.screen.OnScreenGoingShow();
             context.screen.gameObject.SetActive(true);
-            await UniTask.NextFrame();
+            await this.AwaitNextFrame();
             await context.screen.OnScreenShown();
 
         }
 
-        public async UniTask DestroyScreen(ScreenContext context)
+        public async Task DestroyScreen(ScreenContext context)
         {
             if (context == null)
             {
-                await UniTask.CompletedTask;
+                await Task.CompletedTask;
                 return;
             }
             if (uiScreens.ContainsKey(context.key))
@@ -136,11 +136,11 @@ namespace UIFramework
             await HandleScreenDisappear(context);
         }
 
-        private async UniTask HandleScreenDisappear(ScreenContext context)
+        private async Task HandleScreenDisappear(ScreenContext context)
         {
             if (context == null)
             {
-                await UniTask.CompletedTask;
+                await Task.CompletedTask;
             }
 
             // 需要同时卸载Popup
@@ -152,7 +152,7 @@ namespace UIFramework
             context.screen.gameObject?.SetActive(false);
 
             // 等待一帧
-            await UniTask.NextFrame();
+            await this.AwaitNextFrame();
 
             // 需要同时卸载Popup
             foreach (var popup in context.screen.uiPopups)
@@ -164,6 +164,7 @@ namespace UIFramework
             {
                 GameObject.Destroy(context.screen.gameObject);
             }
-        }       
-    }
+        }
+
+    }    
 }

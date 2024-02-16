@@ -1,6 +1,4 @@
-using Cysharp.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using UIFramework;
 using UnityEngine;
 
@@ -8,28 +6,28 @@ public class UISamplePopup : UIPopupBase
 {
     public override string popupName => "UISamplePopup";
 
-    public override async UniTask OnPopupGoingLeave()
+    public override async Task OnPopupGoingLeave()
     {
         Utility.LogDebug(popupName, "OnPopupGoingLeave");
-        await UniTask.CompletedTask;
+        await Task.CompletedTask;
     }
 
-    public override async UniTask OnPopupGoingShow()
+    public override async Task OnPopupGoingShow()
     {
         Utility.LogDebug(popupName, "OnPopupGoingShow");
-        await UniTask.CompletedTask;
+        await Task.CompletedTask;
     }
 
-    public override async UniTask OnPopupHidden()
+    public override async Task OnPopupHidden()
     {
         Utility.LogDebug(popupName, "OnPopupHidden");
-        await UniTask.CompletedTask;
+        await Task.CompletedTask;
     }
 
-    public override async UniTask OnPopupShown()
+    public override async Task OnPopupShown()
     {
         Utility.LogDebug(popupName, "OnPopupShown");
-        await UniTask.CompletedTask;
+        await Task.CompletedTask;
     }
 
     void Awake()

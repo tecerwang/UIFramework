@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,28 +8,28 @@ public class UISampleScreen : UIScreenBase
 {
     public override string screenName => "UISampleScreen";
 
-    public override async UniTask OnScreenGoingLeave()
+    public override async Task OnScreenGoingLeave()
     {
         Utility.LogDebug(screenName, "OnScreenGoingLeave");
-        await UniTask.CompletedTask;
+        await Task.CompletedTask;
     }
 
-    public override async UniTask OnScreenGoingShow()
+    public override async Task OnScreenGoingShow()
     {
         Utility.LogDebug(screenName, "OnScreenGoingShow");
-        await UniTask.CompletedTask;
+        await Task.CompletedTask;
     }
 
-    public override async UniTask OnScreenHidden()
+    public override async Task OnScreenHidden()
     {
         Utility.LogDebug(screenName, "OnScreenHidden");
-        await UniTask.CompletedTask;
+        await Task.CompletedTask;
     }
 
-    public override async UniTask OnScreenShown()
+    public override async Task OnScreenShown()
     {
         Utility.LogDebug(screenName, "OnScreenShown");
-        await UniTask.CompletedTask;
+        await Task.CompletedTask;
     }
 
     private void Awake()

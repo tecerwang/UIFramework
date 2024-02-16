@@ -1,7 +1,7 @@
-using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -22,24 +22,24 @@ namespace UIFramework
         /// <summary>
         /// component is already instantiated,but not actived
         /// </summary>
-        public abstract UniTask OnScreenGoingShow();
+        public abstract Task OnScreenGoingShow();
 
         /// <summary>
         /// component is already instantiated and actived, shown in game
         /// </summary>
-        public abstract UniTask OnScreenShown();
+        public abstract Task OnScreenShown();
 
         /// <summary>
         /// component is actived, and going to inactive self
         /// </summary>
-        public abstract UniTask OnScreenGoingLeave();
+        public abstract Task OnScreenGoingLeave();
 
         /// <summary>
         /// component is already inactived and going to destory
         /// </summary>
-        public abstract UniTask OnScreenHidden();
+        public abstract Task OnScreenHidden();
 
-        public async UniTask<UIPopupBase> CreatePopup(string addressablePath, params object[] paramaters)
+        public async Task<UIPopupBase> CreatePopup(string addressablePath, params object[] paramaters)
         {
             if (!string.IsNullOrEmpty(addressablePath))
             {
@@ -47,7 +47,7 @@ namespace UIFramework
                 {
                     // addressable load
                     AsyncOperationHandle<GameObject> handle = Addressables.LoadAssetAsync<GameObject>($"Popups/{addressablePath}");
-                    var prefab = await handle.ToUniTask<GameObject>();
+                    var prefab = await handle.Task;
                     if (prefab == null)
                     {
                         Utility.LogDebug(screenName, $"popupPrefab {prefab.name} is missing, please check project assets or Addressable Groups");
@@ -87,25 +87,25 @@ namespace UIFramework
             return null;
         }
 
-        private async UniTask HandlePopupAppear(UIPopupBase script)
+        private async Task HandlePopupAppear(UIPopupBase script)
         {
             if (script == null)
             {
-                await UniTask.CompletedTask;
+                await Task.CompletedTask;
             }
             Utility.LogDebug("UIScreenManager", $"screenPrefab {script.popupName} HandleScreenDisappear");
             await script.OnPopupGoingShow();
             script.gameObject.SetActive(true);
-            await UniTask.NextFrame();
+            await this.AwaitNextFrame();
             await script.OnPopupShown();
 
         }
 
-        public async UniTask DestroyPopup(UIPopupBase script)
+        public async Task DestroyPopup(UIPopupBase script)
         {
             if (script == null)
             {
-                await UniTask.CompletedTask;
+                await Task.CompletedTask;
                 return;
             }
             if (uiPopups.Contains(script))
@@ -116,23 +116,23 @@ namespace UIFramework
             await HandlePopupDisappear(script);
         }
 
-        public async UniTask DestoryPopup(GameObject popup)
+        public async Task DestoryPopup(GameObject popup)
         {
             await DestroyPopup(popup.GetComponent<UIPopupBase>());
         }
 
-        private async UniTask HandlePopupDisappear(UIPopupBase script)
+        private async Task HandlePopupDisappear(UIPopupBase script)
         {
             if (script == null)
             {
-                await UniTask.CompletedTask;
+                await Task.CompletedTask;
             }
 
             await script.OnPopupGoingLeave();
             script.gameObject?.SetActive(false);
             
             // µÈ´ýÒ»Ö¡
-            await UniTask.NextFrame();
+            await this.AwaitNextFrame();
 
             await script.OnPopupHidden();
             if (script.gameObject != null)
