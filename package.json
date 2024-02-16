@@ -15,5 +15,10 @@
     "author": {
         "name": "wangyanqing",
         "email": "1025981817@qq.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tecerwang/UIFramework.git",
+        "subdirectory": "Assets/UIFramework"
     }
 }
