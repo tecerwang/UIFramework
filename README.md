@@ -7,7 +7,7 @@ UI Screen&Popup 显示框架
 UnityEngine
 
 #### UnityPackage Dependencies
-UnityEngine.Addressable is required    
+com.unity.addressables    
 
 #### 使用说明
 
