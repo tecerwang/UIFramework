@@ -7,8 +7,7 @@ UI Screen&Popup 显示框架
 UnityEngine
 
 #### UnityPackage Dependencies
-UniTask  
-Addressables  
+UniTask  "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask"  
 
 #### 使用说明
 

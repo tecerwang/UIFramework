@@ -7,15 +7,6 @@
       "dependencies": {},
       "hash": "809d23edae0df58fd0f61b4b6f67855c59d1b2fb"
     },
-    "com.uiframework.unity": {
-      "version": "https://github.com/tecerwang/UIFramework.git?path=Assets/UIFramework",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {
-        "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask"
-      },
-      "hash": "cf66dd867d0a16b508c80930f451f0e027654ed7"
-    },
     "com.unity.addressables": {
       "version": "1.21.19",
       "depth": 0,

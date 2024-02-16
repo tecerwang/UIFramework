@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
-    "com.uiframework.unity": "https://github.com/tecerwang/UIFramework.git?path=Assets/UIFramework",
     "com.unity.addressables": "1.21.19",
     "com.unity.ai.navigation": "1.1.5",
     "com.unity.collab-proxy": "2.2.0",
