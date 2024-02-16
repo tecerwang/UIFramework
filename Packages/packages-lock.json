@@ -7,12 +7,14 @@
       "dependencies": {},
       "hash": "809d23edae0df58fd0f61b4b6f67855c59d1b2fb"
     },
-    "com.sandolkakosdigital.unitypackagemanagerutilities": {
-      "version": "https://github.com/sandolkakos/unity-package-manager-utilities.git",
+    "com.uiframework.unity": {
+      "version": "https://github.com/tecerwang/UIFramework.git?path=Assets/UIFramework",
       "depth": 0,
       "source": "git",
-      "dependencies": {},
-      "hash": "ed39e0470ffd50b3eeca4c8d01ea486e5427408e"
+      "dependencies": {
+        "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask"
+      },
+      "hash": "cf66dd867d0a16b508c80930f451f0e027654ed7"
     },
     "com.unity.addressables": {
       "version": "1.21.19",

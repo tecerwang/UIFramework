@@ -19,4 +19,4 @@ Addressables
 5.基于 UniTask 异步功能的代码风格； 
 
 #### Unity package import
-https://github.com/tecerwang/UIFramework?path=Assets/UIFramework
+https://github.com/tecerwang/UIFramework.git?path=Assets/UIFramework
