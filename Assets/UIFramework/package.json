@@ -21,7 +21,7 @@
         "url": "https://github.com/tecerwang/UIFramework.git",
         "subdirectory": "Assets/UIFramework"
     },
-   "samples": [
+   "samples":
     {
       "displayName": "UI Framework Sample",
       "description": "UI Framework Sample.",
