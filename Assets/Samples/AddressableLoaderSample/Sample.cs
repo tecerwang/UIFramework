@@ -5,7 +5,7 @@ using UIFramework;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace UIFrameworkSample
+namespace UIFrameworkSample.Addressable
 {
     public class Smaple : MonoBehaviour
     {
@@ -14,7 +14,8 @@ namespace UIFrameworkSample
         {
             if (UIScreenManager.singleton.IsInited)
             {
-                _ = UIScreenManager.singleton.CreateScreen("UISampleScreen.prefab");
+               var screen = new AddressableAssetLoader<GameObject>("Screens/UISampleScreen.prefab");
+                _ = UIScreenManager.singleton.CreateScreen(screen);
             }
         }
 
@@ -35,10 +36,12 @@ namespace UIFrameworkSample
 
         private async Task CreateUIScreenAndPopup()
         {
-            var screen = await UIScreenManager.singleton.CreateScreen("UISampleScreen.prefab");
-            if (screen != null)
+            var screenloader = new AddressableAssetLoader<GameObject>("Screens/UISampleScreen.prefab");           
+            if (screenloader != null)
             {
-                await screen.CreatePopup("UISamplePopup.Prefab");
+                var screenScript = await UIScreenManager.singleton.CreateScreen(screenloader);
+                var popuploader = new AddressableAssetLoader<GameObject>("Popups/UISamplePopup.Prefab");
+                await screenScript.CreatePopup(popuploader);
             }
         }
     }

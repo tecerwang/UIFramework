@@ -3,7 +3,7 @@ using UIFramework;
 using UnityEngine;
 
 
-namespace UIFrameworkSample
+namespace UIFrameworkSample.Addressable
 {
     public class UISamplePopup : UIPopupBase
     {

@@ -45,15 +45,14 @@ namespace UIFramework
         /// <param name="path"> addressable path ,</param>
         /// <param name="paramaters">参数</param>
         /// <returns>返回屏幕脚本实例</returns>
-        public async Task<UIScreenBase> CreateScreen(string addressablePath, params object[] paramaters)
+        public async Task<UIScreenBase> CreateScreen(AsyncLoadAsset<GameObject> assetLoader, params object[] paramaters)
         {
-            if (!string.IsNullOrEmpty(addressablePath))
+            if (assetLoader != null)
             {
                 try
                 {
                     // addressable load
-                    AsyncOperationHandle<GameObject> handle = Addressables.LoadAssetAsync<GameObject>($"Screens/{addressablePath}");
-                    var prefab = await handle.Task;
+                    var prefab = await assetLoader.LoadAssetAsync();
                     if (prefab == null)
                     {
                         Utility.LogDebug("UIScreenManager", $"screenPrefab {prefab.name} is missing, please check project assets or Addressable Groups");
@@ -63,13 +62,12 @@ namespace UIFramework
                     // 实例化
                     var instance = GameObject.Instantiate(prefab);
                     instance.gameObject.SetActive(false);
-                   
+
                     // find screen script
                     UIScreenBase script = instance.GetComponent<UIScreenBase>();
-                    instance.name = script.screenName;
-
                     if (script != null)
                     {
+                        instance.name = script.screenName;
                         // create screen context
                         var context = new ScreenContext()
                         {

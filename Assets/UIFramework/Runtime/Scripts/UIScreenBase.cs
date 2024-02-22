@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace UIFramework
 {   
@@ -39,52 +37,47 @@ namespace UIFramework
         /// </summary>
         public abstract Task OnScreenHidden();
 
-        public async Task<UIPopupBase> CreatePopup(string addressablePath, params object[] paramaters)
+        public async Task<UIPopupBase> CreatePopup(AsyncLoadAsset<GameObject> assetLoader, params object[] paramaters)
         {
-            if (!string.IsNullOrEmpty(addressablePath))
+            try
             {
-                try
+                // addressable load
+                var prefab = await assetLoader.LoadAssetAsync();
+                if (prefab == null)
                 {
-                    // addressable load
-                    AsyncOperationHandle<GameObject> handle = Addressables.LoadAssetAsync<GameObject>($"Popups/{addressablePath}");
-                    var prefab = await handle.Task;
-                    if (prefab == null)
-                    {
-                        Utility.LogDebug(screenName, $"popupPrefab {prefab.name} is missing, please check project assets or Addressable Groups");
-                        return null;
-                    }
-                    Utility.LogDebug(screenName, $"loaded popupPrefab {prefab.name}");
-                    // 实例化
-                    var instance = GameObject.Instantiate(prefab, gameObject.transform);
-                    instance.gameObject.SetActive(false);
-
-                    // find screen script
-                    UIPopupBase script = instance.GetComponent<UIPopupBase>();
-                    instance.name = script.popupName;
-
-                    if (script != null)
-                    {
-                        script.paramaters = paramaters;
-                        // add context to repo
-                        uiPopups.Add(script);
-                        _ = HandlePopupAppear(script);
-                        Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} add to Scene");
-                        return script;
-                    }
-                    else
-                    {
-                        GameObject.Destroy(instance);
-                        Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} does not contains UIScreenBase Script, will destory the gameobject whitch is instantiated");
-                        return null;
-                    }
+                    Utility.LogDebug(screenName, $"popupPrefab {prefab.name} is missing, please check project assets or Addressable Groups");
+                    return null;
                 }
-                catch (Exception ex)
+                Utility.LogDebug(screenName, $"loaded popupPrefab {prefab.name}");
+                // 实例化
+                var instance = GameObject.Instantiate(prefab, gameObject.transform);
+                instance.gameObject.SetActive(false);
+
+                // find screen script
+                UIPopupBase script = instance.GetComponent<UIPopupBase>();
+                instance.name = script.popupName;
+
+                if (script != null)
                 {
-                    Utility.LogExpection("UIScreenManager:", ex.ToString());
+                    script.paramaters = paramaters;
+                    // add context to repo
+                    uiPopups.Add(script);
+                    _ = HandlePopupAppear(script);
+                    Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} add to Scene");
+                    return script;
+                }
+                else
+                {
+                    GameObject.Destroy(instance);
+                    Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} does not contains UIScreenBase Script, will destory the gameobject whitch is instantiated");
                     return null;
                 }
             }
-            return null;
+            catch (Exception ex)
+            {
+                Utility.LogExpection("UIScreenManager:", ex.ToString());
+                return null;
+            }
         }
 
         private async Task HandlePopupAppear(UIPopupBase script)
