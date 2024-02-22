@@ -1,10 +1,10 @@
+#if ADDRESSABLES_ENABLED
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-#if ADDRESSABLES_ENABLED
 namespace UIFramework
 {
     public class AddressableAssetLoader<T> : AsyncLoadAsset<T> where T : Object
