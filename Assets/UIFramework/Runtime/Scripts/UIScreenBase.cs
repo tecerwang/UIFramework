@@ -58,8 +58,10 @@ namespace UIFramework
                 instance.name = script.popupName;
 
                 if (script != null)
-                {
+                {                  
                     script.paramaters = paramaters;
+                    script.screen = this;
+
                     // add context to repo
                     uiPopups.Add(script);
                     _ = HandlePopupAppear(script);
