@@ -37,7 +37,7 @@ namespace UIFramework
         /// </summary>
         public abstract Task OnScreenHidden();
 
-        public async Task<UIPopupBase> CreatePopup(AsyncLoadAsset<GameObject> assetLoader, params object[] paramaters)
+        public virtual async Task<UIPopupBase> CreatePopup(AsyncLoadAsset<GameObject> assetLoader, params object[] paramaters)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace UIFramework
 
         }
 
-        public async Task DestroyPopup(UIPopupBase script)
+        public virtual async Task DestroyPopup(UIPopupBase script)
         {
             if (script == null)
             {
@@ -107,11 +107,6 @@ namespace UIFramework
             }
             Utility.LogDebug("UIScreenManager", $"popupPrefab {script.popupName} HandleScreenDisappear");
             await HandlePopupDisappear(script);
-        }
-
-        public async Task DestoryPopup(GameObject popup)
-        {
-            await DestroyPopup(popup.GetComponent<UIPopupBase>());
         }
 
         private async Task HandlePopupDisappear(UIPopupBase script)
