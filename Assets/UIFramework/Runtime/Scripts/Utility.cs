@@ -56,9 +56,13 @@ namespace UIFramework
         private static string CombineLogParams(params object[] args)
         {
             string result = string.Empty;
-            foreach (var arg in args)
+            if (args.Length > 0)
             {
-                result += arg.ToString();
+                foreach (var arg in args)
+                {
+                    result += arg.ToString() + ", ";
+                }
+                result = result.Substring(0, result.Length - 2);
             }
             return result;
         }
