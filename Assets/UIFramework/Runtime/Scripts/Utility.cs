@@ -60,9 +60,9 @@ namespace UIFramework
             {
                 foreach (var arg in args)
                 {
-                    result += arg.ToString() + ", ";
+                    result += arg.ToString() + " ";
                 }
-                result = result.Substring(0, result.Length - 2);
+                result = result.Substring(0, result.Length - 1);
             }
             return result;
         }
