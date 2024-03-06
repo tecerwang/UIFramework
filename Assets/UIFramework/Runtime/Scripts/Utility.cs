@@ -23,7 +23,7 @@ namespace UIFramework
 
         public static void LogDebug(string prefix, params object[] args)
         {
-            Debug.Log($"<color=#ffff00ff>[{prefix}] </color>" + CombineLogParams(args));
+            Debug.Log($"<color=#00ff00ff>[{prefix}] </color>" + CombineLogParams(args));
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace UIFramework
         {
             if (logLevel == LogLevel.Internal)
             {
-                Debug.Log($"<color=#888888ff>{CombineLogParams(args)}</color>");
+                Debug.Log("<color=#888888ff>LogInternal </color>" + CombineLogParams(args));
             }
         }
 
@@ -45,12 +45,12 @@ namespace UIFramework
 
         public static void LogExpection(params object[] args)
         {
-            Debug.Log($"<color=#bbbb00ff>{CombineLogParams(args)}</color>");
+            Debug.Log("<color=#bbbb00ff>Expection </color>" + CombineLogParams(args));
         }
 
         public static void LogError(params object[] args)
         {
-            Debug.Log($"<color=#ff0000ff>{CombineLogParams(args)}</color>");
+            Debug.Log("<color=#ff0000ff>Error </color>" + CombineLogParams(args));
         }
 
         private static string CombineLogParams(params object[] args)
