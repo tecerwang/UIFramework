@@ -62,7 +62,7 @@ namespace UIFramework
                 {
                     result += arg.ToString() + " ";
                 }
-                result = result.Substring(0, result.Length - 2);
+                result = result.Substring(0, result.Length - 1);
             }
             return result;
         }
