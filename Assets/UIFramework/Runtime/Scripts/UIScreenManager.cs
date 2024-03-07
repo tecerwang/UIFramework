@@ -110,7 +110,7 @@ namespace UIFramework
             Utility.LogDebug("UIScreenManager", $"screenPrefab {context.screen.name} HandleScreenAppear");            
             await context.screen.UpdateScreenState(UIScreenBase.State.goingShow);
             context.screen.gameObject.SetActive(true);
-            await this.AwaitNextFrame();
+            await MonoBehaviourHelper.AwaitNextFrame();
             await context.screen.UpdateScreenState(UIScreenBase.State.shown);
         }
 

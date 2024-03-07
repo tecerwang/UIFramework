@@ -40,7 +40,7 @@ namespace UIFramework
             }
         }
        
-        public static async Task AwaitNextFrame(this MonoBehaviour mono)
+        public static async Task AwaitNextFrame()
         {
             // ÄÚ²¿º¯Êý
             IEnumerator DelayOneFrameCoroutine(Action onComplete)
