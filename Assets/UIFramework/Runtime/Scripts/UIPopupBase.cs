@@ -15,7 +15,7 @@ namespace UIFramework
         /// <summary>
         /// paramaters
         /// </summary>
-        public object[] paramaters;
+        public object[] parameters;
 
         /// <summary>
         /// the screen witch hold this popup

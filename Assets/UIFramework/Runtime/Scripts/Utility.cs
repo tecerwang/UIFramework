@@ -43,7 +43,7 @@ namespace UIFramework
             Debug.LogWarning(CombineLogParams(args));
         }
 
-        public static void LogExpection(params object[] args)
+        public static void LogException(params object[] args)
         {
             Debug.Log("<color=#bbbb00ff>Expection </color>" + CombineLogParams(args));
         }

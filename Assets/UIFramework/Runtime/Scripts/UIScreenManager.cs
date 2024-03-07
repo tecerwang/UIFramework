@@ -1,6 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -11,7 +10,7 @@ namespace UIFramework
     /// </summary>
     public class UIScreenManager : MonoBehaviour
     {
-        public Dictionary<string, ScreenContext> uiScreens { get; private set; } = new Dictionary<string, ScreenContext>();
+        public ConcurrentDictionary<string, ScreenContext> uiScreens { get; private set; } = new ConcurrentDictionary<string, ScreenContext>();
 
         public static UIScreenManager singleton;
 
@@ -41,9 +40,9 @@ namespace UIFramework
         /// </summary>
         /// <typeparam name="T">屏幕 script 类型</typeparam>
         /// <param name="path"> addressable path ,</param>
-        /// <param name="paramaters">参数</param>
+        /// <param name="parameters">参数</param>
         /// <returns>返回屏幕脚本实例</returns>
-        public async Task<UIScreenBase> CreateScreen(AsyncLoadAsset<GameObject> assetLoader, params object[] paramaters)
+        public async Task<UIScreenBase> CreateScreen(AsyncLoadAsset<GameObject> assetLoader, params object[] parameters)
         {
             if (assetLoader != null)
             {
@@ -71,12 +70,10 @@ namespace UIFramework
                         {
                             screen = script
                         };
-                        if (!uiScreens.ContainsKey(context.key))
+                        if (uiScreens.TryAdd(context.key, context))
                         {
-                            script.paramaters = paramaters;
-                            // add context to repo
-                            uiScreens.Add(context.key, context);
-                            _ = HandleScreenAppear(context);
+                            script.parameters = parameters;
+                            await　HandleScreenAppear(context);
                             Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} add to Scene");
                             return script;
                         }
@@ -90,13 +87,13 @@ namespace UIFramework
                     else
                     {
                         GameObject.Destroy(instance);
-                        Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} does not contains UIScreenBase Script, will destory the gameobject whitch is instantiated");
+                        Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} does not contain UIScreenBase Script, will destroy the gameobject which is instantiated");
                         return null;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Utility.LogExpection("UIScreenManager:", ex.ToString());
+                    Utility.LogException("UIScreenManager:", ex.ToString());
                     return null;
                 }
             }
@@ -114,7 +111,6 @@ namespace UIFramework
             context.screen.gameObject.SetActive(true);
             await this.AwaitNextFrame();
             await context.screen.OnScreenShown();
-
         }
 
         public async Task DestroyScreen(ScreenContext context)
@@ -124,12 +120,15 @@ namespace UIFramework
                 await Task.CompletedTask;
                 return;
             }
-            if (uiScreens.ContainsKey(context.key))
+            if (uiScreens.TryRemove(context.key, out _))
             {
-                uiScreens.Remove(context.key);
+                Utility.LogDebug("UIScreenManager", $"screenPrefab {context.screen.name} HandleScreenDisappear");
+                await HandleScreenDisappear(context);
             }
-            Utility.LogDebug("UIScreenManager", $"screenPrefab {context.screen.name} HandleScreenDisappear");
-            await HandleScreenDisappear(context);
+            else
+            {
+                Utility.LogDebug("UIScreenManager", $"does not contains screenPrefab {context.screen.name}");
+            }
         }
 
         private async Task HandleScreenDisappear(ScreenContext context)
@@ -162,5 +161,5 @@ namespace UIFramework
             }
         }
 
-    }    
+    }
 }
