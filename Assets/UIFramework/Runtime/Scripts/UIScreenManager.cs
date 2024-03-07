@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -73,7 +74,7 @@ namespace UIFramework
                         if (uiScreens.TryAdd(context.key, context))
                         {
                             script.parameters = parameters;
-                            await　HandleScreenAppear(context);
+                            await HandleScreenAppear(context);
                             Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} add to Scene");
                             return script;
                         }
@@ -106,11 +107,11 @@ namespace UIFramework
             {
                 await Task.CompletedTask;
             }
-            Utility.LogDebug("UIScreenManager", $"screenPrefab {context.screen.name} HandleScreenAppear");
-            await context.screen.OnScreenGoingShow();
+            Utility.LogDebug("UIScreenManager", $"screenPrefab {context.screen.name} HandleScreenAppear");            
+            await context.screen.UpdateScreenState(UIScreenBase.State.goingShow);
             context.screen.gameObject.SetActive(true);
             await this.AwaitNextFrame();
-            await context.screen.OnScreenShown();
+            await context.screen.UpdateScreenState(UIScreenBase.State.shown);
         }
 
         public async Task<bool> DestroyScreen(ScreenContext context)
@@ -139,23 +140,18 @@ namespace UIFramework
                 await Task.CompletedTask;
             }
 
+            // 一定等到显示完成在进行销毁
+            await context.screen.AwaitToTargetState(UIScreenBase.State.shown);
+
             // 需要同时卸载Popup
-            foreach (var popup in context.screen.uiPopups)
+            foreach (var popup in context.screen.uiPopups.AsParallel())
             {
-                await popup.OnPopupGoingLeave();
+                await context.screen.DestroyPopup(popup.Key);
             }
-            await context.screen.OnScreenGoingLeave();
+
+            await context.screen.UpdateScreenState(UIScreenBase.State.goingLeave);
             context.screen.gameObject?.SetActive(false);
-
-            // 等待一帧
-            await this.AwaitNextFrame();
-
-            // 需要同时卸载Popup
-            foreach (var popup in context.screen.uiPopups)
-            {
-                await popup.OnPopupHidden();
-            }
-            await context.screen.OnScreenHidden();
+            await context.screen.UpdateScreenState(UIScreenBase.State.hidden);
             if (context.screen.gameObject != null)
             {
                 GameObject.Destroy(context.screen.gameObject);

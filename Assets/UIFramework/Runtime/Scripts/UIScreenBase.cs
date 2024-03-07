@@ -10,31 +10,78 @@ namespace UIFramework
     /// </summary>   
     public abstract class UIScreenBase : MonoBehaviour
     {
-        public ConcurrentBag<UIPopupBase> uiPopups { get; private set; } = new ConcurrentBag<UIPopupBase>();
+        public ConcurrentDictionary<UIPopupBase, bool> uiPopups { get; private set; }
+            = new ConcurrentDictionary<UIPopupBase, bool>();
 
         public abstract string screenName { get; }
 
         public object[] parameters;
 
+        public enum State
+        {
+            created,
+            goingShow,
+            shown,
+            present,
+            goingLeave,
+            hidden
+        }
+
+        public State curState { get; private set; } = State.created;
+
+        /// <summary>
+        /// 等待直到达到 target 状态
+        /// </summary>
+        /// <param name="targetState"></param>
+        /// <returns></returns>
+        public async Task AwaitToTargetState(State targetState)
+        {
+            while (true)
+            {
+                if ((int)targetState <= (int)curState)
+                {
+                    return;
+                }
+                await this.AwaitNextFrame();
+            }
+        }
+
+        public async Task UpdateScreenState(State state)
+        {
+            curState = state;
+            switch (state)
+            {
+                case State.goingShow: await this.OnScreenGoingShow(); break;
+                case State.shown:
+                    {
+                        await this.OnScreenShown();
+                        this.curState = State.present;
+                        break;
+                    }
+                case State.goingLeave: await this.OnScreenGoingLeave(); break;
+                case State.hidden: await this.OnScreenHidden(); break;
+            }
+        }
+
         /// <summary>
         /// component is already instantiated, but not active
         /// </summary>
-        public abstract Task OnScreenGoingShow();
+        protected abstract Task OnScreenGoingShow();
 
         /// <summary>
         /// component is already instantiated and active, shown in game
         /// </summary>
-        public abstract Task OnScreenShown();
+        protected abstract Task OnScreenShown();
 
         /// <summary>
         /// component is active, and going to inactive itself
         /// </summary>
-        public abstract Task OnScreenGoingLeave();
+        protected abstract Task OnScreenGoingLeave();
 
         /// <summary>
         /// component is already inactive and going to destroy
         /// </summary>
-        public abstract Task OnScreenHidden();
+        protected abstract Task OnScreenHidden();
 
         public virtual async Task<UIPopupBase> CreatePopup(AsyncLoadAsset<GameObject> assetLoader, params object[] parameters)
         {
@@ -56,13 +103,10 @@ namespace UIFramework
                 UIPopupBase script = instance.GetComponent<UIPopupBase>();
                 instance.name = script.popupName;
 
-                if (script != null)
+                if (script != null && uiPopups.TryAdd(script, true))
                 {
                     script.parameters = parameters;
                     script.screen = this;
-
-                    // add context to repo
-                    uiPopups.Add(script);
                     await HandlePopupAppear(script);
                     Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} add to Scene");
                     return script;
@@ -88,10 +132,10 @@ namespace UIFramework
                 await Task.CompletedTask;
             }
             Utility.LogDebug("UIScreenManager", $"screenPrefab {script.popupName} HandleScreenDisappear");
-            await script.OnPopupGoingShow();
+            await script.UpdatePopupState(UIPopupBase.State.goingShow);
             script.gameObject.SetActive(true);
             await this.AwaitNextFrame();
-            await script.OnPopupShown();
+            await script.UpdatePopupState(UIPopupBase.State.shown);
         }
 
         public virtual async Task<bool> DestroyPopup(UIPopupBase script)
@@ -100,10 +144,13 @@ namespace UIFramework
             {
                 return false;
             }
-
-            // Remove the script from the ConcurrentBag
-            if (uiPopups.TryTake(out _))
+          
+            // 先从集合中移除，此时已经无法从外部获取到这个Popup
+            if (uiPopups.TryRemove(script, out _))
             {
+                // 一定等到显示完成在进行销毁
+                await script.AwaitAfterTargetState(UIPopupBase.State.present);
+
                 Utility.LogDebug("UIScreenManager", $"popupPrefab {script.popupName} HandleScreenDisappear");
                 await HandlePopupDisappear(script);
                 return true;
@@ -122,17 +169,22 @@ namespace UIFramework
                 await Task.CompletedTask;
             }
 
-            await script.OnPopupGoingLeave();
+            await script.UpdatePopupState(UIPopupBase.State.goingLeave);
             script.gameObject?.SetActive(false);
 
             // Wait for one frame
             await this.AwaitNextFrame();
 
-            await script.OnPopupHidden();
+            await script.UpdatePopupState(UIPopupBase.State.hidden);
             if (script.gameObject != null)
             {
                 GameObject.Destroy(script.gameObject);
             }
+        }
+
+        public bool ContainsPopup(UIPopupBase popup)
+        {
+            return uiPopups.ContainsKey(popup);
         }
     }
 

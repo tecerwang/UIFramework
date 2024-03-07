@@ -6,8 +6,25 @@ using UnityEngine;
 
 namespace UIFramework
 {
-    public static class MonoBehaviourHelper
+    public static class MonoBehaviourHelper 
     {
+        private static MonoBehaviourHelperHost _host;
+
+        private static MonoBehaviourHelperHost host
+        {
+            get
+            {
+                if (_host == null)
+                {
+                    var hostObj = new GameObject();
+                    hostObj.name = "[MonoBehaviourHelperHost]";
+                    _host = hostObj.AddComponent<MonoBehaviourHelperHost>();
+                    GameObject.DontDestroyOnLoad(hostObj);
+                }
+                return _host;
+            }
+        }
+
         public static void DestroyChildren(this Transform parent)
         {
             if (parent == null)
@@ -33,7 +50,7 @@ namespace UIFramework
             }
 
             var tcs = new TaskCompletionSource<bool>();
-            mono.StartCoroutine(DelayOneFrameCoroutine(() => tcs.SetResult(true)));
+            host.StartCoroutine(DelayOneFrameCoroutine(() => tcs.SetResult(true)));
             await tcs.Task;
         }
     }

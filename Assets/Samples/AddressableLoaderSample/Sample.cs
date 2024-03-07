@@ -4,11 +4,15 @@ using UnityEngine;
 using UIFramework;
 using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine.UI;
 
 namespace UIFrameworkSample.Addressable
 {
     public class Smaple : MonoBehaviour
     {
+        public Button btnAddScreen;
+        public Button btnRemoveScreen;
+
         // Start is called before the first frame update
         void Start()
         {
@@ -17,23 +21,19 @@ namespace UIFrameworkSample.Addressable
                var screen = new AddressableAssetLoader<GameObject>("Screens/UISampleScreen.prefab");
                 _ = UIScreenManager.singleton.CreateScreen(screen);
             }
-        }
 
-        // Update is called once per frame
-        void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.R))
+            btnAddScreen.onClick.AddListener(() => 
+            {
+                _ = CreateUIScreenAndPopup(); 
+            });
+
+            btnRemoveScreen.onClick.AddListener(() =>
             {
                 KeyValuePair<string, ScreenContext>? pair = UIScreenManager.singleton.uiScreens.FirstOrDefault();
                 _ = UIScreenManager.singleton.DestroyScreen(pair?.Value);
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                _ = CreateUIScreenAndPopup();
-            }
+            });
         }
-
+      
         private async Task CreateUIScreenAndPopup()
         {
             var screenloader = new AddressableAssetLoader<GameObject>("Screens/UISampleScreen.prefab");           

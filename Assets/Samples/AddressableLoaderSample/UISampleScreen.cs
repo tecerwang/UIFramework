@@ -11,25 +11,25 @@ namespace UIFrameworkSample.Addressable
     {
         public override string screenName => "UISampleScreen";
 
-        public override async Task OnScreenGoingLeave()
+        protected override async Task OnScreenGoingLeave()
         {
             Utility.LogDebug(screenName, "OnScreenGoingLeave");
             await Task.CompletedTask;
         }
 
-        public override async Task OnScreenGoingShow()
+        protected override async Task OnScreenGoingShow()
         {
             Utility.LogDebug(screenName, "OnScreenGoingShow");
             await Task.CompletedTask;
         }
 
-        public override async Task OnScreenHidden()
+        protected override async Task OnScreenHidden()
         {
             Utility.LogDebug(screenName, "OnScreenHidden");
             await Task.CompletedTask;
         }
 
-        public override async Task OnScreenShown()
+        protected override async Task OnScreenShown()
         {
             Utility.LogDebug(screenName, "OnScreenShown");
             await Task.CompletedTask;
