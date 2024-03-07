@@ -113,21 +113,22 @@ namespace UIFramework
             await context.screen.OnScreenShown();
         }
 
-        public async Task DestroyScreen(ScreenContext context)
+        public async Task<bool> DestroyScreen(ScreenContext context)
         {
             if (context == null)
             {
-                await Task.CompletedTask;
-                return;
+                return false;
             }
             if (uiScreens.TryRemove(context.key, out _))
             {
                 Utility.LogDebug("UIScreenManager", $"screenPrefab {context.screen.name} HandleScreenDisappear");
                 await HandleScreenDisappear(context);
+                return true;
             }
             else
             {
                 Utility.LogDebug("UIScreenManager", $"does not contains screenPrefab {context.screen.name}");
+                return false;
             }
         }
 

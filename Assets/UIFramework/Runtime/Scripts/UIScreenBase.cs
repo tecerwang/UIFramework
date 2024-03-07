@@ -94,12 +94,11 @@ namespace UIFramework
             await script.OnPopupShown();
         }
 
-        public virtual async Task DestroyPopup(UIPopupBase script)
+        public virtual async Task<bool> DestroyPopup(UIPopupBase script)
         {
             if (script == null)
             {
-                await Task.CompletedTask;
-                return;
+                return false;
             }
 
             // Remove the script from the ConcurrentBag
@@ -107,10 +106,12 @@ namespace UIFramework
             {
                 Utility.LogDebug("UIScreenManager", $"popupPrefab {script.popupName} HandleScreenDisappear");
                 await HandlePopupDisappear(script);
+                return true;
             }
             else
             {
                 Utility.LogDebug("UIScreenManager", $"popupPrefab dose not contains in screen's popup collection");
+                return false;
             }
         }
 
