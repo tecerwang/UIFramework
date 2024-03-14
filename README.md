@@ -1,7 +1,8 @@
 # UIFramewrok.master v1.0.0
 
 #### 介绍
-UI Screen&Popup 显示框架
+UI Screen&Popup 显示框架  
+太原展厅项目
 
 #### 软件架构
 UnityEngine
@@ -14,7 +15,7 @@ UnityEngine
 4.基于 async/await 异步功能的代码风格;  
 
 #### Unity package import
-https://github.com/tecerwang/UIFramework.git?path=Assets/UIFramework  
+https://github.com/tecerwang/UIFramework.git?path=Assets/UIFramework#ver1.0.0  
 
 ### Samples
 https://github.com/tecerwang/UIFramework.git
