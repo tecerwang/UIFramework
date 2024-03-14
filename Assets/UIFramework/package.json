@@ -1,6 +1,6 @@
 {
     "name": "com.uiframework.unity",
-    "version": "0.0.2",
+    "version": "1.0.0",
     "displayName": "UI framework for Unity",
     "description": "Unity3d ui managment depend on UGUI with async coding",
     "unity": "2019.1",
