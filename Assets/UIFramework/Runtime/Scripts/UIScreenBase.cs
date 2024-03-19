@@ -144,7 +144,7 @@ namespace UIFramework
             {
                 return false;
             }
-          
+
             // 先从集合中移除，此时已经无法从外部获取到这个Popup
             if (uiPopups.TryRemove(script, out _))
             {
@@ -186,12 +186,10 @@ namespace UIFramework
         {
             return uiPopups.ContainsKey(popup);
         }
-    }
 
-    public class ScreenContext
-    {
-        public string key => screen.screenName;
-
-        public UIScreenBase screen;
+        public override int GetHashCode()
+        {
+            return screenName.GetHashCode();
+        }
     }
 }
