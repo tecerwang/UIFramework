@@ -42,7 +42,7 @@ namespace UIFramework
                 {
                     return;
                 }
-                await this.AwaitNextFrame();
+                await MonoBehaviourHelper.AwaitNextFrame();
             }
         }
 
@@ -134,7 +134,7 @@ namespace UIFramework
             Utility.LogDebug("UIScreenManager", $"screenPrefab {script.popupName} HandleScreenDisappear");
             await script.UpdatePopupState(UIPopupBase.State.goingShow);
             script.gameObject.SetActive(true);
-            await this.AwaitNextFrame();
+            await MonoBehaviourHelper.AwaitNextFrame();
             await script.UpdatePopupState(UIPopupBase.State.shown);
         }
 
@@ -144,7 +144,7 @@ namespace UIFramework
             {
                 return false;
             }
-          
+
             // 先从集合中移除，此时已经无法从外部获取到这个Popup
             if (uiPopups.TryRemove(script, out _))
             {
@@ -173,7 +173,7 @@ namespace UIFramework
             script.gameObject?.SetActive(false);
 
             // Wait for one frame
-            await this.AwaitNextFrame();
+            await MonoBehaviourHelper.AwaitNextFrame();
 
             await script.UpdatePopupState(UIPopupBase.State.hidden);
             if (script.gameObject != null)
@@ -186,12 +186,10 @@ namespace UIFramework
         {
             return uiPopups.ContainsKey(popup);
         }
-    }
 
-    public class ScreenContext
-    {
-        public string key => screen.screenName;
-
-        public UIScreenBase screen;
+        public override int GetHashCode()
+        {
+            return screenName.GetHashCode();
+        }
     }
 }

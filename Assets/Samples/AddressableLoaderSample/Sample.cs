@@ -14,13 +14,12 @@ namespace UIFrameworkSample.Addressable
         public Button btnRemoveScreen;
 
         // Start is called before the first frame update
-        void Start()
+        async void Start()
         {
-            if (UIScreenManager.singleton.IsInited)
-            {
-               var screen = new AddressableAssetLoader<GameObject>("Screens/UISampleScreen.prefab");
-                _ = UIScreenManager.singleton.CreateScreen(screen);
-            }
+            await UIScreenManager.AwaitForInitComplete();
+
+            var screen = new AddressableAssetLoader<GameObject>("Screens/UISampleScreen.prefab");
+            _ = UIScreenManager.singleton.CreateScreen(screen);
 
             btnAddScreen.onClick.AddListener(() => 
             {
@@ -29,7 +28,7 @@ namespace UIFrameworkSample.Addressable
 
             btnRemoveScreen.onClick.AddListener(() =>
             {
-                KeyValuePair<string, ScreenContext>? pair = UIScreenManager.singleton.uiScreens.FirstOrDefault();
+                KeyValuePair<int, UIScreenBase>? pair = UIScreenManager.singleton.uiScreens.FirstOrDefault();
                 _ = UIScreenManager.singleton.DestroyScreen(pair?.Value);
             });
         }

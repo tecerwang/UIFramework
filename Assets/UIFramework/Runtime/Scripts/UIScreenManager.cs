@@ -11,9 +11,11 @@ namespace UIFramework
     /// </summary>
     public class UIScreenManager : MonoBehaviour
     {
-        public ConcurrentDictionary<string, ScreenContext> uiScreens { get; private set; } = new ConcurrentDictionary<string, ScreenContext>();
+        public ConcurrentDictionary<int, UIScreenBase> uiScreens { get; private set; } = new ConcurrentDictionary<int, UIScreenBase>();
 
         public static UIScreenManager singleton;
+
+        private TaskCompletionSource<bool> initCompleteTCS = new TaskCompletionSource<bool>();
 
         /// <summary>
         /// 是否完成初始化
@@ -25,16 +27,25 @@ namespace UIFramework
             if (singleton == null)
             {
                 singleton = this;
+                singleton.gameObject.name = "[UIScreenManager]";
                 DontDestroyOnLoad(singleton.gameObject);
                 IsInited = true;
-                OnUIScreenManagerInited?.Invoke();
+                initCompleteTCS.SetResult(true);
             }
         }
 
-        /// <summary>
-        /// UIScreenManager 初始化完成
-        /// </summary>
-        public event Action OnUIScreenManagerInited;
+        public static async Task AwaitForInitComplete()
+        {
+            while (singleton == null)
+            {
+                await MonoBehaviourHelper.AwaitNextFrame();
+            }
+            if (singleton.initCompleteTCS.Task.IsCompleted)
+            {
+                return;
+            }
+            await singleton.initCompleteTCS.Task;
+        }
 
         /// <summary>
         /// 显示一个 screen
@@ -66,15 +77,11 @@ namespace UIFramework
                     if (script != null)
                     {
                         instance.name = script.screenName;
-                        // create screen context
-                        var context = new ScreenContext()
-                        {
-                            screen = script
-                        };
-                        if (uiScreens.TryAdd(context.key, context))
+
+                        if (uiScreens.TryAdd(script.GetHashCode(), script))
                         {
                             script.parameters = parameters;
-                            await HandleScreenAppear(context);
+                            await HandleScreenAppear(script);
                             Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} add to Scene");
                             return script;
                         }
@@ -101,62 +108,96 @@ namespace UIFramework
             return null;
         }
 
-        private async Task HandleScreenAppear(ScreenContext context)
+        /// <summary>
+        /// 添加一个现有的 Screen
+        /// </summary>
+        /// <param name="screenInstance"></param>
+        /// <param name="paramters"></param>
+        /// <returns></returns>
+        public async Task<UIScreenBase> PushExistScreen(GameObject instance, params object[] parameters)
         {
-            if (context == null)
+            // find screen script
+            UIScreenBase script = instance.GetComponent<UIScreenBase>();
+            if (script != null)
+            {
+                instance.name = script.screenName;
+                if (uiScreens.TryAdd(script.GetHashCode(), script))
+                {
+                    script.parameters = parameters;
+                    await HandleScreenAppear(script);
+                    Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} add to Scene");
+                    return script;
+                }
+                else
+                {
+                    GameObject.Destroy(instance);
+                    Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} already created, a screen prefab can be created once only");
+                    return null;
+                }
+            }
+            else
+            {
+                GameObject.Destroy(instance);
+                Utility.LogDebug("UIScreenManager", $"screenPrefab {instance.name} does not contain UIScreenBase Script, will destroy the gameobject which is instantiated");
+                return null;
+            }
+        }
+
+        private async Task HandleScreenAppear(UIScreenBase screen)
+        {
+            if (screen == null)
             {
                 await Task.CompletedTask;
             }
-            Utility.LogDebug("UIScreenManager", $"screenPrefab {context.screen.name} HandleScreenAppear");            
-            await context.screen.UpdateScreenState(UIScreenBase.State.goingShow);
-            context.screen.gameObject.SetActive(true);
+            Utility.LogDebug("UIScreenManager", $"screenPrefab {screen.name} HandleScreenAppear");
+            await screen.UpdateScreenState(UIScreenBase.State.goingShow);
+            screen.gameObject.SetActive(true);
             await MonoBehaviourHelper.AwaitNextFrame();
-            await context.screen.UpdateScreenState(UIScreenBase.State.shown);
+            await screen.UpdateScreenState(UIScreenBase.State.shown);
         }
 
-        public async Task<bool> DestroyScreen(ScreenContext context)
+        public async Task<bool> DestroyScreen(UIScreenBase screen)
         {
-            if (context == null)
+            if (screen == null)
             {
                 return false;
             }
-            if (uiScreens.TryRemove(context.key, out _))
+            if (uiScreens.TryRemove(screen.GetHashCode(), out _))
             {
-                Utility.LogDebug("UIScreenManager", $"screenPrefab {context.screen.name} HandleScreenDisappear");
-                await HandleScreenDisappear(context);
+                Utility.LogDebug("UIScreenManager", $"screenPrefab {screen.name} HandleScreenDisappear");
+                await HandleScreenDisappear(screen);
                 return true;
             }
             else
             {
-                Utility.LogDebug("UIScreenManager", $"does not contains screenPrefab {context.screen.name}");
+                Utility.LogDebug("UIScreenManager", $"does not contains screenPrefab {screen.name}");
                 return false;
             }
         }
 
-        private async Task HandleScreenDisappear(ScreenContext context)
+        private async Task HandleScreenDisappear(UIScreenBase screen)
         {
-            if (context == null)
+            if (screen == null)
             {
                 await Task.CompletedTask;
             }
 
             // 一定等到显示完成在进行销毁
-            await context.screen.AwaitToTargetState(UIScreenBase.State.shown);
+            await screen.AwaitToTargetState(UIScreenBase.State.shown);
 
             // 需要同时卸载Popup
-            foreach (var popup in context.screen.uiPopups.AsParallel())
+            foreach (var popup in screen.uiPopups.AsParallel())
             {
-                await context.screen.DestroyPopup(popup.Key);
+                await screen.DestroyPopup(popup.Key);
             }
 
-            await context.screen.UpdateScreenState(UIScreenBase.State.goingLeave);
-            context.screen.gameObject?.SetActive(false);
-            await context.screen.UpdateScreenState(UIScreenBase.State.hidden);
-            if (context.screen.gameObject != null)
+            await screen.UpdateScreenState(UIScreenBase.State.goingLeave);
+            screen.gameObject?.SetActive(false);
+            await screen.UpdateScreenState(UIScreenBase.State.hidden);
+            if (screen.gameObject != null)
             {
-                GameObject.Destroy(context.screen.gameObject);
+                GameObject.Destroy(screen.gameObject);
             }
         }
-
     }
 }
