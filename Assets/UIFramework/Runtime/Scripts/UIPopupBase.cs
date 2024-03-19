@@ -32,7 +32,7 @@ namespace UIFramework
                 {
                     return;
                 }
-                await MonoBehaviourHelper.AwaitNextFrame();
+                await this.AwaitNextFrame();
             }
         }
 

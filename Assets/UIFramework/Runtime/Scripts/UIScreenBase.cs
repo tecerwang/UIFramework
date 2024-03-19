@@ -42,7 +42,7 @@ namespace UIFramework
                 {
                     return;
                 }
-                await MonoBehaviourHelper.AwaitNextFrame();
+                await this.AwaitNextFrame();
             }
         }
 
@@ -134,7 +134,7 @@ namespace UIFramework
             Utility.LogDebug("UIScreenManager", $"screenPrefab {script.popupName} HandleScreenDisappear");
             await script.UpdatePopupState(UIPopupBase.State.goingShow);
             script.gameObject.SetActive(true);
-            await MonoBehaviourHelper.AwaitNextFrame();
+            await this.AwaitNextFrame();
             await script.UpdatePopupState(UIPopupBase.State.shown);
         }
 
@@ -173,7 +173,7 @@ namespace UIFramework
             script.gameObject?.SetActive(false);
 
             // Wait for one frame
-            await MonoBehaviourHelper.AwaitNextFrame();
+            await this.AwaitNextFrame();
 
             await script.UpdatePopupState(UIPopupBase.State.hidden);
             if (script.gameObject != null)
